@@ -20,6 +20,16 @@ see every message, every skip with its reason, and every link click.
 
 It doesn't scrape, automate a browser, or ask for an Instagram password.
 
+![Overview dashboard](docs/Screenshots/overview.png)
+
+| Campaign editor with live preview | Campaign analytics |
+| --- | --- |
+| ![Campaign editor](docs/Screenshots/campaign-editor.png) | ![Campaign analytics](docs/Screenshots/campaign-analytics.png) |
+| **Message log** | **Test simulator (demo mode)** |
+| ![Message log](docs/Screenshots/message-log.png) | ![Test simulator](docs/Screenshots/test-simulator.png) |
+
+*Screenshots from demo mode.*
+
 > **Credits.** CommentFlow uses [OpenReply](https://github.com/diwenne/openreply)
 > as its functional reference. OpenReply is built and maintained by **Diwen
 > Huang**, and was originally forked from
@@ -237,6 +247,12 @@ docs/                    META_SETUP, DEPLOYMENT, LIVE_TEST
 - Login is email + password. There is no email delivery, so invites are links you share yourself.
 - The legal page texts are templates; review them before publishing your Meta app.
 
+## About
+
+Built by Sahifa Syed with AI assistance (Claude). I set the requirements, chose
+OpenReply as the reference, and reviewed the design; the code was generated
+and tested in collaboration with Claude.
+
 ## License
 
-MIT. See [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+MIT © 2026 Sahifa Syed. See [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
