@@ -1,0 +1,80 @@
+# CommentFlow: web app + background worker + PostgreSQL + Redis (+ optional Caddy for HTTPS)
+#
+#   Local / demo:        docker compose up -d --build            -> http://localhost:3000
+#   Public HTTPS server: docker compose --profile https up -d --build
+#                        (set DOMAIN and APP_URL=https://DOMAIN in .env, point DNS at the server)
+
+x-app: &app
+  build: .
+  image: commentflow:latest
+  env_file: .env
+  environment:
+    # Containers talk to each other by service name; these override .env.
+    DATABASE_URL: postgresql://commentflow:${POSTGRES_PASSWORD:-commentflow}@postgres:5432/commentflow
+    REDIS_URL: redis://redis:6379/0
+    NODE_ENV: production
+  depends_on:
+    postgres: { condition: service_healthy }
+    redis: { condition: service_healthy }
+  restart: unless-stopped
+
+services:
+  web:
+    <<: *app
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+
+  worker:
+    <<: *app
+    command: ["node", "dist/worker/index.js"]
+    healthcheck:
+      disable: true
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: commentflow
+      POSTGRES_USER: commentflow
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-commentflow}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U commentflow -d commentflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    # BullMQ requires noeviction; AOF keeps queued jobs across restarts.
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2-alpine
+    profiles: ["https"]
+    environment:
+      DOMAIN: ${DOMAIN:-localhost}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on: [web]
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  redisdata:
+  caddy_data:
+  caddy_config:
