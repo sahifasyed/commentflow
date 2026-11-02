@@ -72,7 +72,7 @@ It doesn't scrape, automate a browser, or ask for an Instagram password.
 
 ```bash
 # 1. Get the code
-git clone <this-repo-url> commentflow
+git clone https://github.com/sahifasyed/commentflow.git
 cd commentflow
 
 # 2. Create your settings file
